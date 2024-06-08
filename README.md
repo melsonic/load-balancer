@@ -31,3 +31,6 @@ The load balancer creates a reverseProxy to direct traffic towards the target se
 #### Future work
 - Add more algorithms.
 - Add a property to check health of the available servers.
+
+#### Result
+![application result](./load-balancer.png "Result")
