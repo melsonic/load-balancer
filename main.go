@@ -3,10 +3,16 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/melsonic/load-balancer/server"
 	"github.com/melsonic/load-balancer/util"
 )
+
+var lbServer http.Server = http.Server{
+	Addr:    util.LBAddress,
+	Handler: http.HandlerFunc(util.LBHandler),
+}
 
 func main() {
 	go func() {
@@ -25,13 +31,17 @@ func main() {
 		log.Fatal(server.Server4.ListenAndServe())
 	}()
 
-	var lbServer http.Server = http.Server{
-		Addr:    util.LBAddress,
-		Handler: http.HandlerFunc(util.LBHandler),
-	}
-
 	go func() {
 		log.Fatal(lbServer.ListenAndServe())
+	}()
+
+	// server health check
+	go func() {
+		var ticker *time.Ticker = time.NewTicker(15 * time.Second)
+		for {
+			util.CheckHealth()
+			<-ticker.C
+		}
 	}()
 
 	select {}
